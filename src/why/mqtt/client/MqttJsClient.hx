@@ -42,9 +42,17 @@ class MqttJsClient extends BaseClient {
 
 					function onConnect() {
 						haxe.Timer.delay(resolve.bind(Noise), 0);  // there may be error right after connect and we should prioritize that
+						var bindings:CallbackLink = null;
 						
-						native.on('close', () -> disconnectedTrigger.trigger(Noise));
-						native.on('message', (topic, payload:Buffer, packet) -> messageReceivedTrigger.trigger(new Message(topic, payload, packet.qos, packet.retain)));
+						native.on('close', function onClose() {
+							disconnectedTrigger.trigger(Noise);
+							if(config.reconnectPeriod == 0) bindings.cancel();
+						});
+						native.on('message', function onMessage(topic, payload:Buffer, packet) messageReceivedTrigger.trigger(new Message(topic, payload, packet.qos, packet.retain)));
+						bindings = [
+							native.off.bind('close', onClose),
+							native.off.bind('message', onMessage)
+						];
 					}
 
 					function onConnectFail(err) {
