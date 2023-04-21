@@ -39,13 +39,22 @@ class MqttJsClient extends BaseClient {
 							}
 						}
 					});
-					
-					native.on('connect', () -> {
+
+					function onConnect() {
 						haxe.Timer.delay(resolve.bind(Noise), 0);  // there may be error right after connect and we should prioritize that
+						
 						native.on('close', () -> disconnectedTrigger.trigger(Noise));
 						native.on('message', (topic, payload:Buffer, packet) -> messageReceivedTrigger.trigger(new Message(topic, payload, packet.qos, packet.retain)));
-					});
-					native.on('error', err -> if(config.reconnectPeriod == 0) reject(Error.ofJsError(err)));
+					}
+
+					function onConnectFail(err) {
+						if(config.reconnectPeriod == 0) {
+							reject(Error.ofJsError(err));
+						}
+					}
+					
+					native.on('connect', onConnect);
+					native.on('error', onConnectFail);
 					
 				}
 				catch(e)
