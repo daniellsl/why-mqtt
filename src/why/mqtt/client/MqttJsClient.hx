@@ -62,7 +62,10 @@ class MqttJsClient extends BaseClient {
 							reject(Error.ofJsError(err));
 						}
 					});
-					// initBindings = [];
+					initBindings = [
+						native.off.bind('connect', onConnect),
+						native.off.bind('error', onConnectFail),
+					];
 				}
 				catch(e)
 					reject(Error.withData('Native driver failed to connect', e));
