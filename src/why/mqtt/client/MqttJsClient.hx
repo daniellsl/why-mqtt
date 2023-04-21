@@ -60,7 +60,7 @@ class MqttJsClient extends BaseClient {
 
 					function onConnectFail(err) {
 						if(config.reconnectPeriod == 0) {
-							initBindings.cancel();
+							// initBindings.cancel();
 							reject(Error.ofJsError(err));
 						}
 					}
