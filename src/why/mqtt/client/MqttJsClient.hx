@@ -41,7 +41,7 @@ class MqttJsClient extends BaseClient {
 					});
 
 					var initBindings:CallbackLink = null;
-					native.on('connect', function onConnect() {
+					native.once('connect', function onConnect() {
 						haxe.Timer.delay(resolve.bind(Noise), 0);  // there may be error right after connect and we should prioritize that
 						initBindings.cancel();
 						var bindings:CallbackLink = null;
@@ -56,16 +56,16 @@ class MqttJsClient extends BaseClient {
 							native.off.bind('message', onMessage)
 						];
 					});
-					native.on('error', function onConnectFail(err) {
+					native.once('error', function onConnectFail(err) {
 						if(config.reconnectPeriod == 0) {
 							initBindings.cancel();
 							reject(Error.ofJsError(err));
 						}
 					});
-					initBindings = [
-						native.off.bind('connect', onConnect),
-						native.off.bind('error', onConnectFail),
-					];
+					// initBindings = [
+					// 	native.off.bind('connect', onConnect),
+					// 	native.off.bind('error', onConnectFail),
+					// ];
 				}
 				catch(e)
 					reject(Error.withData('Native driver failed to connect', e));
