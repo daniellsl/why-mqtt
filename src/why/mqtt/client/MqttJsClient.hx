@@ -43,7 +43,8 @@ class MqttJsClient extends BaseClient {
 					var initBindings:CallbackLink = null;
 					native.once('connect', function onConnect() {
 						haxe.Timer.delay(resolve.bind(Noise), 0);  // there may be error right after connect and we should prioritize that
-						initBindings.cancel();
+						// initBindings.cancel();
+						native.off.bind('connect', onConnect);
 						var bindings:CallbackLink = null;
 						
 						native.on('close', function onClose() {
@@ -58,7 +59,8 @@ class MqttJsClient extends BaseClient {
 					});
 					native.once('error', function onConnectFail(err) {
 						if(config.reconnectPeriod == 0) {
-							initBindings.cancel();
+							native.off.bind('connect', onConnect);
+							native.off.bind('error', onConnectFail);
 							reject(Error.ofJsError(err));
 						}
 					});
