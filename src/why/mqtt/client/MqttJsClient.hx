@@ -62,6 +62,7 @@ class MqttJsClient extends BaseClient {
 							reject(Error.ofJsError(err));
 						}
 					});
+					// SO, Problem comes in here, why???
 					// initBindings = [
 					// 	native.off.bind('connect', onConnect),
 					// 	native.off.bind('error', onConnectFail),
