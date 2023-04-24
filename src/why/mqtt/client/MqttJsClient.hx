@@ -66,7 +66,6 @@ class MqttJsClient extends BaseClient {
 					native.once('error', function onConnectFail(err) {
 						if(!autoReconnect) {
 							native.off('connect', onConnect);
-							native.off('error', onConnectFail);
 							reject(Error.ofJsError(err));
 						}
 					});
